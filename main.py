@@ -25,6 +25,12 @@ class PlotCSVData:
             x = df[x_plot].tolist()
         else:
             x = range(0, len(y))
+        try:
+            with open("web.txt", "w") as w:
+                w.write("X: " + str(list(x)) + "\n")
+                w.write("Y: " + str(list(y)))
+        except Exception as E:
+            print(E)
         x = numpy.array(x)
         y = numpy.array(y)
         # fg = pyplot.figure(num=identifier, figsize=(width,height))
@@ -138,29 +144,28 @@ class PlotSerialData:
             print("Format error", Lenght)
             raise TypeError
 
-
-s = PlotSerialData()
-# Default Format
-PlotDict = {}
-while True:
-    data = s.RecieveData("COM9")
-    data = data.readline().decode().replace("\n", '').replace("\r", '').strip()
-    data_formatted = data.split(" ")
-    for itter in range(len(data_formatted)):
-        try:
-            if itter % 2 == 0:
-                PlotDict.setdefault(data_formatted[itter], []).append(float(data_formatted[itter + 1]))
-                try:
-                    if len(PlotDict.get(data_formatted[len(data_formatted) - 2])) > 50:  # Get Key of Last Set
-                        PlotDict = {}
-                        print(PlotDict)
-                        # TODO Remove (50/2) number of elements by [n:] if 50/2 is reached give limit as the same
-                        s.Plotter("MPU6050 Data", PlotDict, "clear", 50)
-                except:
-                    pass
-        except Exception as e:
-            print(e)
-    # with open("DataBackup.json", "a") as backupFile:
-    #     json.dump(PlotDict, backupFile, indent=4)
-    # print(PlotDict)
-    s.Plotter("MPU6050 Data", PlotDict, "data", limit=50)
+# s = PlotSerialData()
+# # Default Format
+# PlotDict = {}
+# while True:
+#     data = s.RecieveData("COM3")
+#     data = data.readline().decode().replace("\n", '').replace("\r", '').strip()
+#     data_formatted = data.split(" ")
+#     for itter in range(len(data_formatted)):
+#         try:
+#             if itter % 2 == 0:
+#                 PlotDict.setdefault(data_formatted[itter], []).append(float(data_formatted[itter + 1]))
+#                 try:
+#                     if len(PlotDict.get(data_formatted[len(data_formatted) - 2])) > 50:  # Get Key of Last Set
+#                         PlotDict = {}
+#                         print(PlotDict)
+#                         # TODO Remove (50/2) number of elements by [n:] if 50/2 is reached give limit as the same
+#                         s.Plotter("MPU6050 Data", PlotDict, "clear", 50)
+#                 except:
+#                     pass
+#         except Exception as e:
+#             print(e)
+#     with open("DataBackup.json", "w") as backupFile:
+#         json.dump(PlotDict, backupFile, indent=4)
+#     print(PlotDict)
+#     s.Plotter("MPU6050 Data", PlotDict, "data", limit=50)

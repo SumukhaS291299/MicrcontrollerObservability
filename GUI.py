@@ -202,6 +202,10 @@ def CallAnimation():
     DoneButton.pack(side=tkinter.BOTTOM, pady=10)
 
 
+def Quit():
+    exit(0)
+
+
 def MainLoop():
     global canvas, root
     root = tkinter.Tk()
@@ -219,6 +223,8 @@ def MainLoop():
     MultiPlotGraph.pack(padx=10, pady=20)
     GraphAnimation = tkinter.Button(root, text="Graph animation", bd="5", command=CallAnimation)
     GraphAnimation.pack(padx=10, pady=20)
+    QuitButton = tkinter.Button(root, text="Quit", bd="5", command=Quit)
+    QuitButton.pack(side=tkinter.BOTTOM, pady=10)
     root.mainloop()
 
 
