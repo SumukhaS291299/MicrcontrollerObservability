@@ -1,4 +1,5 @@
 import json
+import sys
 import tkinter
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
@@ -27,6 +28,7 @@ def LoadingAnimation():
 def CanvasStartAnimation():
     global canvas, StartAnimCount, root
     canvas.delete("all")
+    canvas.create_text(150, 20, text="An open-source plotter by Sumukha S", fill="green", font=('Helvetica 11 bold'))
     if StartAnimCount <= 6:
         if (StartAnimCount % 2) == 0:
             canvas.create_text(150, 150, text="/", fill="purple", font=('Helvetica 30 bold'))
@@ -222,7 +224,7 @@ def ReadLiveData():
                             PlotDict = {}
                             # print(PlotDict)
                             # TODO Remove (50/2) number of elements by [n:] if 50/2 is reached give limit as the same
-                            s.Plotter("MPU6050 Data", PlotDict, "clear", 300)
+                            s.Plotter("Clearing...", PlotDict, "clear", 300)
                     except:
                         pass
             except Exception as e:
@@ -230,7 +232,7 @@ def ReadLiveData():
         with open("DataBackup.json", "w") as backupFile:
             json.dump(PlotDict, backupFile, indent=4)
         # print(PlotDict)
-        s.Plotter("MPU6050 Data", PlotDict, "data", limit=50)
+        s.Plotter("Live Data", PlotDict, "data", limit=50)
 
 
 def CallReadLiveData():
@@ -254,8 +256,13 @@ def CallReadLiveData():
     DoneButton.pack(side=tkinter.BOTTOM, pady=10)
 
 
+def about():
+    msg = 'Developer: Sumukha S\nStable Release: Beta 1.3\nEmail: sumukhashivashankar@outlook.com\nPython Version: 3.11'
+    tkinter.messagebox.showinfo(title="Software Version", message=msg)
+
+
 def Quit():
-    exit(0)
+    sys.exit(0)
 
 
 def MainLoop():
@@ -275,12 +282,12 @@ def MainLoop():
     MultiPlotGraph.pack(padx=10, pady=20)
     GraphAnimation = tkinter.Button(root, text="Graph animation", bd="5", command=CallAnimation)
     GraphAnimation.pack(padx=10, pady=20)
-
     GraphAnimation = tkinter.Button(root, text="Read Live Data", bd="5", command=CallReadLiveData)
     GraphAnimation.pack(padx=10, pady=20)
-
+    About = tkinter.Button(root, text="About", bd="5", command=about)
+    About.pack(side=tkinter.RIGHT, padx=20, pady=10)
     QuitButton = tkinter.Button(root, text="Quit", bd="5", command=Quit)
-    QuitButton.pack(side=tkinter.BOTTOM, pady=10)
+    QuitButton.pack(side=tkinter.LEFT, pady=10, padx=20)
     root.mainloop()
 
 
