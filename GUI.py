@@ -1,9 +1,12 @@
+import json
 import tkinter
+from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 
 import pandas as pd
 
 from main import PlotCSVData
+from main import PlotSerialData
 
 StartAnimCount = 0
 LoadingX = 150
@@ -202,6 +205,59 @@ def CallAnimation():
     DoneButton.pack(side=tkinter.BOTTOM, pady=10)
 
 
+def ReadLiveData():
+    global s, DefaultCOM
+    PlotDict = {}
+    while True:
+        data = s.RecieveData(str(DefaultCOM.get()))
+        data = data.readline().decode().replace("\n", '').replace("\r", '').strip()
+        data_formatted = data.split(" ")
+        # print(data_formatted)
+        for itter in range(len(data_formatted)):
+            try:
+                if itter % 2 == 0:
+                    PlotDict.setdefault(data_formatted[itter], []).append(float(data_formatted[itter + 1]))
+                    try:
+                        if len(PlotDict.get(data_formatted[len(data_formatted) - 2])) > 300:  # Get Key of Last Set
+                            PlotDict = {}
+                            # print(PlotDict)
+                            # TODO Remove (50/2) number of elements by [n:] if 50/2 is reached give limit as the same
+                            s.Plotter("MPU6050 Data", PlotDict, "clear", 300)
+                    except:
+                        pass
+            except Exception as e:
+                print(e)
+        with open("DataBackup.json", "w") as backupFile:
+            json.dump(PlotDict, backupFile, indent=4)
+        # print(PlotDict)
+        s.Plotter("MPU6050 Data", PlotDict, "data", limit=50)
+
+
+def CallReadLiveData():
+    global s, DefaultCOM
+    print("Checking ComPorts...")
+    s = PlotSerialData()
+    Ports = s.ListAvailablePorts()
+    tkinter.messagebox.showinfo(title="Available COM Ports", message=s.AllComPortsDisplay())
+    s.ListAvailablePorts()
+    ReadLiveDataWin = tkinter.Tk()
+    ReadLiveDataWin.title("S√PyPlots")
+    ReadLiveDataWin.geometry('640x480')
+    Title = tkinter.Label(ReadLiveDataWin, text="Live Data Reader", font=("Terminal", 25))
+    Title.pack(side=tkinter.TOP, pady=5)
+    DefaultCOM = tkinter.StringVar(ReadLiveDataWin)
+    DefaultCOM.set("Select an Option")
+    comPorts = list(Ports.keys())
+    COMOptionsBox = tkinter.OptionMenu(ReadLiveDataWin, DefaultCOM, *comPorts)
+    COMOptionsBox.pack()
+    DoneButton = tkinter.Button(ReadLiveDataWin, text="Done", command=ReadLiveData)
+    DoneButton.pack(side=tkinter.BOTTOM, pady=10)
+
+
+def Quit():
+    exit(0)
+
+
 def MainLoop():
     global canvas, root
     root = tkinter.Tk()
@@ -219,6 +275,12 @@ def MainLoop():
     MultiPlotGraph.pack(padx=10, pady=20)
     GraphAnimation = tkinter.Button(root, text="Graph animation", bd="5", command=CallAnimation)
     GraphAnimation.pack(padx=10, pady=20)
+
+    GraphAnimation = tkinter.Button(root, text="Read Live Data", bd="5", command=CallReadLiveData)
+    GraphAnimation.pack(padx=10, pady=20)
+
+    QuitButton = tkinter.Button(root, text="Quit", bd="5", command=Quit)
+    QuitButton.pack(side=tkinter.BOTTOM, pady=10)
     root.mainloop()
 
 
