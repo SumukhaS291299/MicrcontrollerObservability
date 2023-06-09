@@ -5,7 +5,9 @@ from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 
 import pandas as pd
+from matplotlib import pyplot
 
+from main import Addons
 from main import PlotCSVData
 from main import PlotSerialData
 
@@ -42,18 +44,18 @@ def CanvasStartAnimation():
 
 def GetSingleGraph():
     # Replace with multi value and df.head
-    global HeadEntry, DefaultValueX, DefaultValueY, file
+    global HeadEntry, DefaultValueX, DefaultValueY, file, StyleSelected, utilsDict
     plotter = PlotCSVData(
-        file, str(HeadEntry.get()))
+        file, str(HeadEntry.get()), PyplotStyle=StyleSelected, Utils=utilsDict)
     plot = plotter.ShowSingleGraph(x_plot=str(DefaultValueX.get()), y_plot=str(DefaultValueY.get()))
     plot.show()
 
 
 def GetMultiGraph():
     # Replace with multi value and df.head
-    global MultiGraphfile, HeadEntry_MultiGraph, YPlot_Box
+    global MultiGraphfile, HeadEntry_MultiGraph, YPlot_Box, StyleSelected, utilsDict
     plotter = PlotCSVData(
-        MultiGraphfile, str(HeadEntry_MultiGraph.get()))
+        MultiGraphfile, str(HeadEntry_MultiGraph.get()), PyplotStyle=StyleSelected, Utils=utilsDict)
     selected_tuple = YPlot_Box.curselection()
     selected = []
     for indx in selected_tuple:
@@ -138,7 +140,7 @@ def GetAnimationGraph():
     # Replace with multi value and df.head
     global GraphAnimationFile, HeadEntry_AnimGraph, PlotBufferEntry, PauseIntervalSelector, YPlot_Box_Anim
     plotter = PlotCSVData(
-        GraphAnimationFile, str(HeadEntry_AnimGraph.get()))
+        GraphAnimationFile, str(HeadEntry_AnimGraph.get()), PyplotStyle=StyleSelected, utils={})
     selected_tuple = YPlot_Box_Anim.curselection()
     selected = []
     for indx in selected_tuple:
@@ -261,12 +263,51 @@ def about():
     tkinter.messagebox.showinfo(title="Software Version", message=msg)
 
 
+def setOptions():
+    # TODO Add Grid and other style options
+    # TODO Add functional changes
+    global DefaultStyle, opt, StyleSelected, addons, utilsDict
+    UpdatedLable = tkinter.Label(opt, text="Updated values...", font=("Terminal", 15))
+    UpdatedLable.pack()
+    selected_tuple = addons.curselection()
+    selected = []
+    for indx in selected_tuple:
+        selected.append(addons.get(indx))
+    utilsDict = {"addons": selected}
+    StyleSelected = str(DefaultStyle.get())
+    opt.destroy()
+
+
+def options():
+    global DefaultStyle, opt, addons
+    opt = tkinter.Tk()
+    opt.title("S√PyPlots")
+    opt.geometry('640x480')
+    optTitle = tkinter.Label(opt, text="Welcome to S√PyPlots", font=("Terminal", 25))
+    optTitle.pack(side=tkinter.TOP, pady=5)
+    plotStyles = pyplot.style.available
+    DefaultStyle = tkinter.StringVar(opt)
+    DefaultStyle.set("default")
+    plotSytleOptions = tkinter.OptionMenu(opt, DefaultStyle, *plotStyles)
+    plotSytleOptions.pack()
+    # utils also called addons and used intechangably
+    utils = Addons.AvailableAddons()
+    addons = tkinter.Listbox(opt, selectmode=tkinter.MULTIPLE, height=6)
+    for col in utils:
+        addons.insert(tkinter.END, col)
+    addons.pack()
+    Done = tkinter.Button(opt, text="Done", bd="5", command=setOptions)
+    Done.pack(padx=10, pady=20)
+
+
 def Quit():
     sys.exit(0)
 
 
 def MainLoop():
-    global canvas, root
+    global canvas, root, DefaultStyle, utilsDict, StyleSelected
+    StyleSelected = 'default'
+    utilsDict = {}
     root = tkinter.Tk()
     root.title("S√PyPlots")
     root.geometry('640x480')
@@ -284,6 +325,8 @@ def MainLoop():
     GraphAnimation.pack(padx=10, pady=20)
     GraphAnimation = tkinter.Button(root, text="Read Live Data", bd="5", command=CallReadLiveData)
     GraphAnimation.pack(padx=10, pady=20)
+    OptionsButton = tkinter.Button(root, text="Options", bd="5", command=options)
+    OptionsButton.pack(padx=10, pady=20)
     About = tkinter.Button(root, text="About", bd="5", command=about)
     About.pack(side=tkinter.RIGHT, padx=20, pady=10)
     QuitButton = tkinter.Button(root, text="Quit", bd="5", command=Quit)
