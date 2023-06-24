@@ -140,7 +140,7 @@ def GetAnimationGraph():
     # Replace with multi value and df.head
     global GraphAnimationFile, HeadEntry_AnimGraph, PlotBufferEntry, PauseIntervalSelector, YPlot_Box_Anim
     plotter = PlotCSVData(
-        GraphAnimationFile, str(HeadEntry_AnimGraph.get()), PyplotStyle=StyleSelected, utils={})
+        GraphAnimationFile, str(HeadEntry_AnimGraph.get()), PyplotStyle=StyleSelected, Utils={})
     selected_tuple = YPlot_Box_Anim.curselection()
     selected = []
     for indx in selected_tuple:
@@ -296,6 +296,9 @@ def options():
     for col in utils:
         addons.insert(tkinter.END, col)
     addons.pack()
+    IntegrateWithRange = tkinter.Label(opt, text="Integrate with range only available with single graph",
+                                       font=("Terminal", 11), highlightcolor="red")
+    IntegrateWithRange.pack()
     Done = tkinter.Button(opt, text="Done", bd="5", command=setOptions)
     Done.pack(padx=10, pady=20)
 

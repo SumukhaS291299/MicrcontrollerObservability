@@ -1,3 +1,5 @@
+import tkinter
+
 import numpy
 import pandas as pd
 import scipy
@@ -10,17 +12,19 @@ class Addons:
 
     @staticmethod
     def AvailableAddons():
-        availableAddons = ["Integration", "differentiation"]
+        availableAddons = ["Integration", "differentiation", "Integrate with range"]
         return availableAddons
 
-    def integrate(self, X: numpy.ndarray, Y: numpy.ndarray, save="None", type="cumulative_trapezoid"):
+    def integrate(self, X: numpy.ndarray, Y: numpy.ndarray, save=True, type="cumulative_trapezoid"):
         integral = scipy.integrate.cumulative_trapezoid(y=Y, x=X)
-        pyplot.figure()
+        pyplot.figure(num=1)
         pyplot.title("Integral graph")
         pyplot.plot(integral)
         pyplot.figure()
         pyplot.title("Area marking")
         # TODO Check and add filter if auto and x values are different
+        pyplot.figure(num=2)
+        pyplot.title("Area Highlights")
         pyplot.fill_between(x=X, y1=Y, color='purple')  # alpha=0.5
 
 
@@ -35,6 +39,11 @@ class PlotCSVData:
         self.MID = 0.525
         self.utils = Utils
         self.adds = Addons()
+
+    def integrateRange(self):
+        self.adds.integrate(self.SigleGraphx_ndGraph[self.SigleGraphFromSlider.get():self.SigleGraphToSlider.get()],
+                            self.SigleGraphy_ndGraph[self.SigleGraphFromSlider.get():self.SigleGraphToSlider.get()])
+        pyplot.show()
 
     def CheckAddons(self, selectedAddons):
         AvailableList = Addons.AvailableAddons()
@@ -71,6 +80,42 @@ class PlotCSVData:
                     self.adds.integrate(X=x, Y=y)
             except Exception as e:
                 print("Could not use the addon", e)
+            try:
+                print(addonsSel)
+                if "Integrate with range" in addonsSel:
+                    # Create Slider
+                    SingleGraphSliderWin = tkinter.Tk()
+                    SingleGraphSliderWin.title("S√PyPlots")
+                    SingleGraphSliderWin.geometry('400x240')
+                    FromSliderLabel = tkinter.Label(SingleGraphSliderWin,
+                                                    text="Welcome to Custom \nArea Configurator",
+                                                    font=("Terminal", 18))
+                    FromSliderLabel.grid(row=0, column=0)
+                    FromSliderLabel = tkinter.Label(SingleGraphSliderWin,
+                                                    text="Please Select From point:",
+                                                    font=("Terminal", 15))
+                    FromSliderLabel.grid(row=1, column=0)
+                    SliderFrom = tkinter.Scale(SingleGraphSliderWin, from_=x[0],
+                                               to=x[len(x) - 1],
+                                               orient="horizontal")
+                    SliderFrom.grid(row=1, column=1)
+                    ToSliderLabel = tkinter.Label(SingleGraphSliderWin, text="Select To Point",
+                                                  font=("Terminal", 15))
+                    ToSliderLabel.grid(row=2, column=0)
+                    SliderTo = tkinter.Scale(SingleGraphSliderWin, from_=x[0],
+                                             to=x[len(x) - 1],
+                                             orient="horizontal")
+                    SliderTo.grid(row=2, column=1)
+                    self.SigleGraphFromSlider = SliderFrom
+                    self.SigleGraphToSlider = SliderTo
+                    self.SigleGraphx_ndGraph = x
+                    self.SigleGraphy_ndGraph = y
+                    DoneButton = tkinter.Button(SingleGraphSliderWin, text="Done",
+                                                command=self.integrateRange)
+                    DoneButton.grid(row=3, column=3)
+            except:
+                # Ignoring Slider
+                pass
         return pyplot
 
     def ShowMultiGraph(self, y_plots: list):
