@@ -1,6 +1,7 @@
 import tkinter
 
 import numpy
+import pandas
 import pandas as pd
 import scipy
 import serial
@@ -15,14 +16,16 @@ class Addons:
         availableAddons = ["Integration", "differentiation", "Integrate with range"]
         return availableAddons
 
-    def integrate(self, X: numpy.ndarray, Y: numpy.ndarray, save=True, type="cumulative_trapezoid"):
+    def integrate(self, fileName: str, X: numpy.ndarray, Y: numpy.ndarray, save=True, type="cumulative_trapezoid"):
         integral = scipy.integrate.cumulative_trapezoid(y=Y, x=X)
+        IntegrateOut = pandas.DataFrame(integral)
+        IntegrateOut.to_csv(fileName)
         pyplot.figure(num=1)
         pyplot.title("Integral graph")
         pyplot.plot(integral)
         pyplot.figure()
         pyplot.title("Area marking")
-        # TODO Check and add filter if auto and x values are different
+        # TODO Check and add filter if auto and x values are different ZIP
         pyplot.figure(num=2)
         pyplot.title("Area Highlights")
         pyplot.fill_between(x=X, y1=Y, color='purple')  # alpha=0.5
@@ -41,21 +44,23 @@ class PlotCSVData:
         self.adds = Addons()
 
     def integrateRange(self):
-        self.adds.integrate(self.SigleGraphx_ndGraph[self.SigleGraphFromSlider.get():self.SigleGraphToSlider.get()],
+        self.adds.integrate("DefiniteIntegrals_" + self.identifier + ".csv",
+                            self.SigleGraphx_ndGraph[self.SigleGraphFromSlider.get():self.SigleGraphToSlider.get()],
                             self.SigleGraphy_ndGraph[self.SigleGraphFromSlider.get():self.SigleGraphToSlider.get()])
+        pyplot.plot(self.SigleGraphx_ndGraph, self.SigleGraphy_ndGraph)
         pyplot.show()
 
     def CheckAddons(self, selectedAddons):
         AvailableList = Addons.AvailableAddons()
+        subsetselection = []
         try:
             for i in selectedAddons.get("addons"):
-                subsetselection = []
                 if i in AvailableList:
                     subsetselection.append(i)
-                return subsetselection
         except:
             # print("Nothing was selected")
             return []
+        return subsetselection
 
     def ShowSingleGraph(self, x_plot: str, y_plot: str):
         df = pd.read_csv(self.csv_dir)
@@ -77,7 +82,7 @@ class PlotCSVData:
         if addonsSel != []:
             try:
                 if "Integration" in addonsSel:
-                    self.adds.integrate(X=x, Y=y)
+                    self.adds.integrate("SpySinglePlots_" + self.identifier + ".csv", X=x, Y=y)
             except Exception as e:
                 print("Could not use the addon", e)
             try:
@@ -112,7 +117,7 @@ class PlotCSVData:
                     self.SigleGraphy_ndGraph = y
                     DoneButton = tkinter.Button(SingleGraphSliderWin, text="Done",
                                                 command=self.integrateRange)
-                    DoneButton.grid(row=3, column=3)
+                    DoneButton.grid(row=3, column=0)
             except:
                 # Ignoring Slider
                 pass
@@ -131,7 +136,8 @@ class PlotCSVData:
             if addonsSel != []:
                 try:
                     if "Integration" in addonsSel:
-                        self.adds.integrate(X=numpy.array(range(len(y))), Y=y)
+                        self.adds.integrate("SpyMultiPlots_" + self.identifier + ".csv", X=numpy.array(range(len(y))),
+                                            Y=y)
                 except Exception as e:
                     print("Could not use the addon", e)
         pyplot.title(self.identifier)
