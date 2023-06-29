@@ -329,7 +329,9 @@ def options():
                                        text="Integrate with range only available with single graph(Plot X-Y Graph)",
                                        font=("Terminal", 11), highlightcolor="red")
     IntegrateWithRange.pack()
-    IntegrateWithRange = tkinter.Label(opt, text="Differentiation only available with single graph(Plot X-Y Graph)",
+    IntegrateWithRange.pack()
+    IntegrateWithRange = tkinter.Label(opt,
+                                       text="Roots,Slope only available with single graph(Plot X-Y Graph) \nas the X-axis is dynamically sized",
                                        font=("Terminal", 11), highlightcolor="red")
     IntegrateWithRange.pack()
     Done = tkinter.Button(opt, text="Done", bd="5", command=setOptions)
