@@ -4,8 +4,10 @@ import tkinter
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 
+import pandas
 import pandas as pd
 from matplotlib import pyplot
+from tabulate import tabulate
 
 from main import Addons
 from main import PlotCSVData
@@ -278,6 +280,33 @@ def setOptions():
     opt.destroy()
 
 
+def addonsManager():
+    global utilsDict, StyleSelected, root
+    addonManagerWin = tkinter.Toplevel(root)
+    addonManagerWin.title("S√PyPlots")
+    addonManagerWin.geometry('640x280')
+    addonManagerWinTitle = tkinter.Label(addonManagerWin, text="Welcome to S√PyPlots Plugin Manager",
+                                         font=("Terminal", 15))
+    addonManagerWinTitle.pack()
+    addonManagerWinTitle = tkinter.Label(addonManagerWin, text="",
+                                         font=("Terminal", 11))
+    addonManagerWinTitle.pack()
+    addonManagerWinTitle.pack()
+    StyleSelector = tkinter.Label(addonManagerWin, text=f"Selected Style = {StyleSelected}",
+                                  font=("Terminal", 11))
+    StyleSelector.pack()
+    if utilsDict == {}:
+        addonManagerWinNone = tkinter.Label(addonManagerWin, text="None of the Plugins or addons selected",
+                                            font=("Terminal", 11))
+        addonManagerWinNone.pack()
+    else:
+        addonsdf = pandas.DataFrame(utilsDict.get("addons"))
+        addonstr = tabulate(addonsdf, headers=['Sl no.', 'Plugins Activated'], tablefmt='psql')
+        addonManagerWinAvail = tkinter.Label(addonManagerWin, text=addonstr,
+                                             font=("Terminal", 15))
+        addonManagerWinAvail.pack()
+
+
 def options():
     global DefaultStyle, opt, addons
     opt = tkinter.Tk()
@@ -296,7 +325,11 @@ def options():
     for col in utils:
         addons.insert(tkinter.END, col)
     addons.pack()
-    IntegrateWithRange = tkinter.Label(opt, text="Integrate with range only available with single graph",
+    IntegrateWithRange = tkinter.Label(opt,
+                                       text="Integrate with range only available with single graph(Plot X-Y Graph)",
+                                       font=("Terminal", 11), highlightcolor="red")
+    IntegrateWithRange.pack()
+    IntegrateWithRange = tkinter.Label(opt, text="Differentiation only available with single graph(Plot X-Y Graph)",
                                        font=("Terminal", 11), highlightcolor="red")
     IntegrateWithRange.pack()
     Done = tkinter.Button(opt, text="Done", bd="5", command=setOptions)
@@ -313,7 +346,7 @@ def MainLoop():
     utilsDict = {}
     root = tkinter.Tk()
     root.title("S√PyPlots")
-    root.geometry('640x480')
+    root.geometry('640x528')
     # Start Sequence
     Title = tkinter.Label(root, text="Welcome to S√PyPlots", font=("Terminal", 25))
     Title.pack(side=tkinter.TOP, pady=5)
@@ -330,6 +363,8 @@ def MainLoop():
     GraphAnimation.pack(padx=10, pady=20)
     OptionsButton = tkinter.Button(root, text="Options", bd="5", command=options)
     OptionsButton.pack(padx=10, pady=20)
+    AddonsManager = tkinter.Button(root, text="Addons Manager", bd="5", command=addonsManager)
+    AddonsManager.pack(padx=10, pady=20)
     About = tkinter.Button(root, text="About", bd="5", command=about)
     About.pack(side=tkinter.RIGHT, padx=20, pady=10)
     QuitButton = tkinter.Button(root, text="Quit", bd="5", command=Quit)

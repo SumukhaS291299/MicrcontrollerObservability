@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import messagebox
 
 import numpy
 import pandas
@@ -13,7 +14,7 @@ class Addons:
 
     @staticmethod
     def AvailableAddons():
-        availableAddons = ["Integration", "differentiation", "Integrate with range"]
+        availableAddons = ["Integration", "Roots", "Integrate with range", "Slope"]
         return availableAddons
 
     def integrate(self, fileName: str, X: numpy.ndarray, Y: numpy.ndarray, save=True, type="cumulative_trapezoid"):
@@ -29,6 +30,15 @@ class Addons:
         pyplot.figure(num=2)
         pyplot.title("Area Highlights")
         pyplot.fill_between(x=X, y1=Y, color='purple')  # alpha=0.5
+
+    def roots(self, Y: numpy.ndarray, For: float) -> numpy.poly1d:
+        poly = numpy.poly1d(Y)
+        derivative = poly.deriv(For)
+        return derivative
+
+    def Slope(self, Y: numpy.ndarray, X: numpy.ndarray):
+        dydx = numpy.diff(Y) / numpy.diff(X)
+        return dydx
 
 
 class PlotCSVData:
@@ -50,6 +60,28 @@ class PlotCSVData:
         pyplot.plot(self.SigleGraphx_ndGraph, self.SigleGraphy_ndGraph)
         pyplot.show()
 
+    def Roots(self):
+        diffcurrVal = self.adds.roots(self.DiffY, self.DiffSlider.get())
+        if diffcurrVal.roots == []:
+            messagebox.showerror("Roots", "No roots for the selection")
+        else:
+            try:
+                pyplot.figure()
+                pyplot.title("S√PyPlots")
+                pyplot.title("Roots plot at point " + str(self.DiffSlider.get()))
+                pyplot.xlabel("Real")
+                pyplot.ylabel("Imaginary")
+                pyplot.plot((diffcurrVal.roots).real, (diffcurrVal.roots).imag)
+                pyplot.figure()
+                pyplot.title("S√PyPlots")
+                pyplot.title("Roots points at point " + str(self.DiffSlider.get()))
+                pyplot.xlabel("Real")
+                pyplot.ylabel("Imaginary")
+                pyplot.scatter((diffcurrVal.roots).real, (diffcurrVal.roots).imag)
+                pyplot.show()
+            except:
+                messagebox.showwarning("Roots", "No roots or wrong selection")
+
     def CheckAddons(self, selectedAddons):
         AvailableList = Addons.AvailableAddons()
         subsetselection = []
@@ -64,6 +96,7 @@ class PlotCSVData:
 
     def ShowSingleGraph(self, x_plot: str, y_plot: str):
         df = pd.read_csv(self.csv_dir)
+        pyplot.title("S√PyPlots")
         pyplot.figure(self.identifier)
         pyplot.xlabel(x_plot)
         pyplot.ylabel(y_plot)
@@ -86,7 +119,7 @@ class PlotCSVData:
             except Exception as e:
                 print("Could not use the addon", e)
             try:
-                print(addonsSel)
+                # print(addonsSel)
                 if "Integrate with range" in addonsSel:
                     # Create Slider
                     SingleGraphSliderWin = tkinter.Tk()
@@ -121,6 +154,35 @@ class PlotCSVData:
             except:
                 # Ignoring Slider
                 pass
+        try:
+            if "Roots" in addonsSel:
+                SingleGraphDifferentiate = tkinter.Tk()
+                SingleGraphDifferentiate.title("S√PyPlots")
+                SingleGraphDifferentiate.geometry('400x240')
+                ValForDiffLabel = tkinter.Label(SingleGraphDifferentiate,
+                                                text="Welcome to Custom \nDifferentiation Configurator",
+                                                font=("Terminal", 18))
+                ValForDiffLabel.pack()
+                ValForDiff = tkinter.Scale(SingleGraphDifferentiate, from_=x[0],
+                                           to=x[len(x) - 1],
+                                           orient="horizontal")
+                ValForDiff.pack()
+                self.DiffY = y
+                self.DiffSlider = ValForDiff
+                self.DiffWin = SingleGraphDifferentiate
+                DoneButton = tkinter.Button(SingleGraphDifferentiate, text="Done",
+                                            command=self.Roots)
+                DoneButton.pack()
+        except Exception as e:
+            print("Could not use the addon", e)
+        try:
+            if "Slope" in addonsSel:
+                slope = self.adds.Slope(y, x)
+                pyplot.figure()
+                pyplot.title("Slope")
+                pyplot.plot(slope)
+        except:
+            pass
         return pyplot
 
     def ShowMultiGraph(self, y_plots: list):
