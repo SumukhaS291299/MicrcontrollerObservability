@@ -3,7 +3,6 @@ import sys
 import tkinter
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
-
 import pandas
 import pandas as pd
 from matplotlib import pyplot
