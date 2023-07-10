@@ -1,4 +1,4 @@
-import os
+import pickle
 import tkinter
 from tkinter import messagebox
 
@@ -7,12 +7,8 @@ import pandas
 import pandas as pd
 import scipy
 import serial
-import streamlit.runtime.scriptrunner
 from matplotlib import pyplot
 from serial.tools import list_ports
-from webStudio import  WebPlot
-import socket
-from threading import Thread
 
 class Addons:
 
@@ -20,10 +16,6 @@ class Addons:
     def AvailableAddons():
         availableAddons = ["Integration", "Roots", "Integrate with range", "Slope","Multi Graph Web plot"]
         return availableAddons
-
-    # @staticmethod
-    # def StartWebServer():
-    #     os.system(f"streamlit run webStudio.py --server.port 5000")
 
     def integrate(self, fileName: str, X: numpy.ndarray, Y: numpy.ndarray, save=True, type="cumulative_trapezoid"):
         integral = scipy.integrate.cumulative_trapezoid(y=Y, x=X)
@@ -217,18 +209,19 @@ class PlotCSVData:
 
         pyplot.title(self.identifier)
         if addonsSel != []:
+            # TODO Add plot options like column within same window
             try:
                 if "Multi Graph Web plot" in addonsSel:
                     # TODO Web port gui and all interactions and isolate the web code
-                    port = 5001
-                    hostname = socket.gethostname()
-                    IPAddr = socket.gethostbyname(hostname)
-                    messagebox.showinfo("Webpage details",message=f"WebServer running on port {port} or\nUse {IPAddr}:{port}")
-                    wp = WebPlot(len(y_plots))
-                    wp.Plot(2,df,y_plots)
-                    # TODO Only 1 web-window to be shown
-                    # webRunner = Thread(target=wp.runWeb)
-                    # webRunner.run()
+                    with open("dataframe.txt","wb") as dfpickle:
+                        pickle.dump(df,dfpickle)
+                    with open("PLOTS.txt", "wb") as AllPlotsListpickle:
+                        pickle.dump(y_plots,AllPlotsListpickle)
+                    with open("Columns.txt", "wb") as webcols:
+                        pickle.dump(2,webcols)
+                    with open("WebPort.txt", "wb") as webport:
+                        pickle.dump(5000,webport)
+                    messagebox.showinfo("Web Plotter",message="Activated Web Server\nTo use please use\n\n  streamlit run webStudio.py\nInside the same directory")
             except Exception as e:
                 print("Could not use the addon", e)
         return pyplot
