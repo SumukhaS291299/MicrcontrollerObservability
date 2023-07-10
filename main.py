@@ -9,6 +9,7 @@ import scipy
 import serial
 from matplotlib import pyplot
 from serial.tools import list_ports
+import clipboard
 
 class Addons:
 
@@ -217,7 +218,8 @@ class PlotCSVData:
                         pickle.dump(df,dfpickle)
                     with open("PLOTS.txt", "wb") as AllPlotsListpickle:
                         pickle.dump(y_plots,AllPlotsListpickle)
-                    messagebox.showinfo("Web Plotter",message="Activated Web Server\nTo use type\n\n  streamlit run webStudio.py\n\nin a terminal in the same directory\nAll Streamlit flags can also be used with the command!")
+                    clipboard.copy("streamlit run webStudio.py")
+                    messagebox.showinfo("Web Plotter",message="Activated Web Server\nTo use type\n\nCommand copied to clipboard\n\nPaste in a terminal in the same directory\nAll Streamlit flags can also be used with the command!")
             except Exception as e:
                 print("Could not use the addon", e)
         return pyplot
