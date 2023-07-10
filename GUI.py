@@ -1,4 +1,5 @@
 import json
+import pickle
 import sys
 import tkinter
 from tkinter import messagebox
@@ -54,7 +55,7 @@ def GetSingleGraph():
 
 def GetMultiGraph():
     # Replace with multi value and df.head
-    global MultiGraphfile, HeadEntry_MultiGraph, YPlot_Box, StyleSelected, utilsDict
+    global MultiGraphfile, HeadEntry_MultiGraph, YPlot_Box, StyleSelected, utilsDict,WebMultiColnInput
     plotter = PlotCSVData(
         MultiGraphfile, str(HeadEntry_MultiGraph.get()), PyplotStyle=StyleSelected, Utils=utilsDict)
     selected_tuple = YPlot_Box.curselection()
@@ -62,6 +63,11 @@ def GetMultiGraph():
     for indx in selected_tuple:
         selected.append(YPlot_Box.get(indx))
     plot = plotter.ShowMultiGraph(selected)
+    try:
+        with open("Columns.txt", "wb") as webcols:
+            pickle.dump(int(WebMultiColnInput.get()), webcols)
+    except Exception as e:
+        print(e)
     plot.show()
 
 
@@ -104,7 +110,7 @@ def CallSingleGraph():
 
 
 def CallMultiGraph():
-    global MultiGraphfile, HeadEntry_MultiGraph, YPlot_Box
+    global MultiGraphfile, HeadEntry_MultiGraph, YPlot_Box, utilsDict,WebMultiColnInput
     # Do only for CSV files
     MultiGraph = tkinter.Tk()
     MultiGraph.title("S√PyPlots")
@@ -133,6 +139,18 @@ def CallMultiGraph():
     for col in YplotValues:
         YPlot_Box.insert(tkinter.END, col)
     YPlot_Box.pack()
+    CheckWebAddon = utilsDict.get("addons")
+    print(CheckWebAddon)
+    try:
+        WebLayout = tkinter.Label(MultiGraph, text="Number of Columns for the Web layout ", font=("Terminal", 17))
+        WebLayout.pack(padx=20, pady=5)
+        if "Multi Graph Web plot" in CheckWebAddon:
+            WebMultiColnInput = tkinter.Scale(MultiGraph, from_=1,
+                                       to=20,
+                                       orient="horizontal")
+            WebMultiColnInput.pack()
+    except Exception as e:
+        print(e)
     DoneButton = tkinter.Button(MultiGraph, text="Done", command=GetMultiGraph)
     DoneButton.pack(side=tkinter.BOTTOM, pady=10)
 
@@ -333,6 +351,8 @@ def options():
                                        text="Roots,Slope only available with single graph(Plot X-Y Graph) \nas the X-axis is dynamically sized",
                                        font=("Terminal", 11), highlightcolor="red")
     IntegrateWithRange.pack()
+    WEBB = tkinter.Label(opt, text="Multi Graph Web plot[Works with Plot Multi-Plot Graph], \nis used to visualise multiple graphs on a webpage\nWe use Streamlit libraries for the web \ninterface, for more robust \noperations we recommend using the streamlit cli", font=("Terminal", 11))
+    WEBB.pack(padx=20, pady=5)
     Done = tkinter.Button(opt, text="Done", bd="5", command=setOptions)
     Done.pack(padx=10, pady=20)
 

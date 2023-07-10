@@ -217,11 +217,7 @@ class PlotCSVData:
                         pickle.dump(df,dfpickle)
                     with open("PLOTS.txt", "wb") as AllPlotsListpickle:
                         pickle.dump(y_plots,AllPlotsListpickle)
-                    with open("Columns.txt", "wb") as webcols:
-                        pickle.dump(2,webcols)
-                    with open("WebPort.txt", "wb") as webport:
-                        pickle.dump(5000,webport)
-                    messagebox.showinfo("Web Plotter",message="Activated Web Server\nTo use please use\n\n  streamlit run webStudio.py\nInside the same directory")
+                    messagebox.showinfo("Web Plotter",message="Activated Web Server\nTo use type\n\n  streamlit run webStudio.py\n\nin a terminal in the same directory\nAll Streamlit flags can also be used with the command!")
             except Exception as e:
                 print("Could not use the addon", e)
         return pyplot
